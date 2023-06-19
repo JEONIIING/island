@@ -158,7 +158,7 @@ Final Project는 Springframework를 이용해 웹페이지 제작의 전체적�
   </div>
 </details>
 <details>
-  <summary>세미나 리뷰 목록 화면</summary>
+  <summary>세미나 리뷰 수정 화면</summary>
   <br />
   <div markdown="1">
     <image src="https://github.com/JEONIIING/island/blob/main/FinalPrjScreen/ReviewModify.png" />
