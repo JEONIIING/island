@@ -39,7 +39,8 @@ Final Project는 Springframework를 이용해 웹페이지 제작의 전체적�
     - 리뷰 수정하기
     - 리뷰 삭제하기
     - 리뷰 신고하기
-- FAQ
+- 커뮤니티 서비스
+  - FAQ
     - 카테고리별 조회하기
     - 목록 조회하기 
 &nbsp;
