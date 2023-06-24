@@ -37,4 +37,17 @@
 	
 	<beans:bean class="com.google.gson.Gson"></beans:bean>
 	
+	<interceptors>
+		<interceptor>
+			<mapping path="/seminar/**"/>
+			<exclude-mapping path="/seminar/list"/>
+			<exclude-mapping path="/seminar/upload/summernote"/>
+			<exclude-mapping path="/seminar/detail"/>
+			<exclude-mapping path="/seminar/reply/list"/>
+			<exclude-mapping path="/seminar/apply/check"/>
+			<beans:bean class="com.island.app.interceptor.member.MemberChecker"></beans:bean>
+		</interceptor>
+	</interceptors>
+	
+	
 </beans:beans>

@@ -79,13 +79,7 @@ public class SeminarController {
 
    //세미나 개설하기(화면)
    @GetMapping("create")
-   public String createSeminar(Model m, HttpSession session) {
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      if(loginMember == null) {
-         session.setAttribute("alertMsg", "로그인을 먼저 진행해주세요.");
-         return "redirect:/seminar/list";
-      }
-      
+   public String createSeminar(Model m) {
       List<BankVo> bankList = ss.bankCategorySelect();
       if(bankList != null) {
          m.addAttribute("bankList", bankList);
@@ -98,12 +92,7 @@ public class SeminarController {
    @PostMapping("create")
    public String createSeminar(SeminarVo svo, MultipartFile thumbnailFile, HttpServletRequest req , HttpSession session) throws Exception {
       //로그인 회원번호 세팅 
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      if(loginMember == null) {
-         session.setAttribute("alertMsg", "로그인 후 진행해주세요.");
-         return "redirect:/seminar/list";
-      }
-      svo.setWriterNo(loginMember.getNo());
+      svo.setWriterNo(((MemberVo) session.getAttribute("loginMember")).getNo());
       
       //세미나 시작시간~종료시간 세팅
       svo.setSeminarTime(svo.getSHour(), svo.getSMinute(), svo.getFHour(), svo.getFMinute());
@@ -210,13 +199,8 @@ public class SeminarController {
    //세미나 댓글 등록
    @PostMapping("reply/write")
    public String writeSeminarReply(SeminarReplyVo srvo, HttpSession session) {
-      //로그인 되어있는지 확인
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      if(loginMember == null ) {
-         session.setAttribute("alertMsg", "로그인 후 이용해주세요.");
-         return "redirect:/seminar/detail?no=" + srvo.getSNo();
-      }
-      srvo.setWriterNo(loginMember.getNo());
+      //로그인 회원 작성자 번호 세팅
+      srvo.setWriterNo(((MemberVo)session.getAttribute("loginMember")).getNo());
       
       int result = ss.writeSeminarReply(srvo);
       if(result != 1) {
@@ -248,17 +232,8 @@ public class SeminarController {
    //세미나 관심내역 추가
       @GetMapping("interest")
       public String addInterestSeminar(SeminarVo svo, HttpSession session , Model m) throws Exception {
-         //로그인 유저 가져오기 
-         MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-
-         //로그인 유저 있는지 없는지
-         if(loginMember == null) {
-            session.setAttribute("alertMsg", "로그인 후 이용 가능합니다.");
-            return "redirect:/seminar/detail?no=" + svo.getNo();
-         }
-         
          String writerNo = svo.getWriterNo(); //개설자 번호
-         String loginMemberNo = loginMember.getNo();
+         String loginMemberNo = ((MemberVo)session.getAttribute("loginMember")).getNo();
          svo.setLoginMemberNo(loginMemberNo);
 
          
@@ -290,16 +265,7 @@ public class SeminarController {
    
    //세미나 신고하기
    @PostMapping("report")
-   public String reportSeminar(SeminarReportVo srvo, HttpSession session) throws Exception {
-      //로그인 한 유저만 신고 가능
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      
-      //로그인 유저 있는지 없는지
-      if(loginMember == null) {
-         session.setAttribute("alertMsg", "로그인 후 이용 가능합니다.");
-         return "redirect:/seminar/detail?no=" + srvo.getSNo();
-      }
-      
+   public String reportSeminar(SeminarReportVo srvo, HttpSession session) throws Exception { 
       int result = ss.reportSeminar(srvo);
       if(result != 1) {
          throw new Exception("세미나 신고 실패");
@@ -312,15 +278,6 @@ public class SeminarController {
    //세미나 댓글 회원 신고
    @PostMapping("member/report/{sNo}")
    public String reportMember(HttpSession session , MemberReportVo mrvo , @PathVariable String sNo) {
-      //로그인 한 유저만 신고 가능
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      
-      //로그인 유저 있는지 없는지
-      if(loginMember == null) {
-         session.setAttribute("alertMsg", "로그인 후 이용 가능합니다.");
-         return "redirect:/seminar/detail?no=" + sNo;
-      }
-      
       int result = ss.reportMember(mrvo);
       if(result != 1) {
          throw new IllegalStateException("회원 신고 실패");
@@ -333,15 +290,6 @@ public class SeminarController {
    //세미나 수정 페이지(화면)
    @GetMapping("edit/{sNo}")
    public String seminarModify(@PathVariable String sNo, HttpSession session, Model m) {
-      //로그인 한 유저만 신고 가능
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      
-      //로그인 유저 있는지 없는지
-      if(loginMember == null) {
-         session.setAttribute("alertMsg", "로그인 후 이용 가능합니다.");
-         return "redirect:/seminar/detail?no=" + sNo;
-      }
-      
       SeminarVo svo = ss.getSeminarDetailToEdit(sNo);
       if(svo == null) {
          throw new IllegalStateException("세미나 상세조회 실패(수정페이지)");
@@ -415,15 +363,6 @@ public class SeminarController {
    //세미나 신청하기(화면)
    @GetMapping("apply/{sNo}")
    public String applySeminar(@PathVariable String sNo, HttpSession session, Model m ) {
-      //로그인 한 유저만 신청가능
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      
-      //로그인 유저 있는지 없는지
-      if(loginMember == null) {
-         session.setAttribute("alertMsg", "로그인 후 이용 가능합니다.");
-         return "redirect:/seminar/detail?no=" + sNo;
-      }
-
       //신청할 세미나 정보 조회
       SeminarVo svo = ss.getSeminarDetail(sNo);
       if(svo == null) {
@@ -436,14 +375,6 @@ public class SeminarController {
    //세미나 신청하기
    @PostMapping("apply/{sNo}")
    public String applySeminar(@PathVariable String sNo ,HttpSession session, SeminarVo svo) {
-      //로그인 한 유저만 신청가능
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      
-      //로그인 유저 있는지 없는지
-      if(loginMember == null) {
-         session.setAttribute("alertMsg", "로그인 후 이용 가능합니다.");
-         return "redirect:/seminar/detail?no=" + sNo;
-      }
       //서비스
       svo.setNo(sNo);
       int result = ss.applySeminar(svo);
@@ -473,15 +404,6 @@ public class SeminarController {
    //세미나 삭제하기
    @GetMapping("delete/{sNo}")
    public String deleteSeminar(@PathVariable String sNo, HttpSession session) {
-      //로그인 한 유저만 신고 가능
-      MemberVo loginMember = (MemberVo)session.getAttribute("loginMember");
-      
-      //로그인 유저 있는지 없는지
-      if(loginMember == null) {
-         session.setAttribute("alertMsg", "로그인 후 이용 가능합니다.");
-         return "redirect:/seminar/detail?no=" + sNo;
-      }
-      
       int result = ss.deleteSeminar(sNo);
       if(result != 1) {
          throw new IllegalStateException("세미나 게시글 삭제 실패");
